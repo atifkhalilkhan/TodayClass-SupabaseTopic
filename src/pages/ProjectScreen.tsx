@@ -22,6 +22,7 @@ export default function ProjectScreen() {
         const { error } = await supabase.from('Tickets').insert({
             title: "New Ticket",
             description: "Ticket Description",
+            Status: "todo",
             spaceId: spaceId,
             projectId: projectId
         });
@@ -34,7 +35,16 @@ export default function ProjectScreen() {
         }
     }
 
-
+     const UpdateStatus = async (ticketId: number, Status: string)=>{
+        const { error } = await supabase.from('Tickets').update({Status: Status}).eq('id', ticketId);
+        if (error) {
+            console.log("Error updating status:", error);
+        }
+        else {
+            console.log("Status updated successfully");
+            GetTickets();
+        }
+     }
     useEffect(() => {
         GetTickets()
     }, [projectId])
@@ -47,6 +57,13 @@ export default function ProjectScreen() {
             <div key={ticket.id}>
                 <h3>{ticket.title}</h3>
                 <p>{ticket.description}</p>
+                <select value={ticket.Status} onChange={(e)=>UpdateStatus(ticket.id,e.target.value)} >
+                    <option value="todo">Todo</option>
+                    <option value="inprogress">In Progress</option>
+                    <option value="done">Done</option>
+                </select>
+                 
+                <p>{ticket.Status}</p>
             </div>
         ))}
     </div>
